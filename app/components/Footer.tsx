@@ -1,33 +1,45 @@
-'use client'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC } from 'react'
 import Visitors from './Visitors'
+import { prisma } from '@/prisma'
 
+// GET VisitCounter
+const getCounter = async () => {
+  'use server'
+  const visitors = await prisma.visitor.findUnique({
+      where: {
+         id: "65bbaadc02c0c3f726dcbf3a" 
+      },
+      select: {
+        count: true
+      }
+    })
+    return Number(visitors?.count)
+}
+// increment VisitCounter
+const incrementVisitors = async (count: number | undefined) => {
+  'use server'
+  
+  let newCount = count ? count + 1 : undefined
 
-type FooterProps = {
-    visitors: number | undefined,
-    getCounter: () => Promise<any>,
-    incrementVisitors: (count: number | undefined) => Promise<void>
+  await prisma.visitor.update({
+      where: {
+         id: "65bbaadc02c0c3f726dcbf3a" 
+      },
+      data: {
+        count: newCount
+      }
+    })
 }
 
-const Footer: FC<FooterProps> =  ({ getCounter, incrementVisitors, visitors }) => {
-    const [counter, setCounter] = useState(visitors)
-
-    // increment counter request & and set new counter from server
-    useEffect(() => {
-        const result = async () => {
-            await incrementVisitors(counter)
-            const c =  await getCounter()
-            setCounter(c)
-        }
-        result()      
-    }, [])
-    
+const Footer: FC = async () => {
+      // get visitCounter from server
+    const counter = await getCounter()
     
   return (
     <footer className="h-[10vh] flex justify-center items-center gap-10">
         
         {/* Visitors Component */}
-       <Visitors counter={counter} />
+       <Visitors visitors={counter} incrementVisitors={incrementVisitors} getCounter={getCounter} />
 
     </footer>
   )
