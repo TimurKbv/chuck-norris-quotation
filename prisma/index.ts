@@ -4,15 +4,7 @@ export const prisma = new PrismaClient()
 
 async function main() {
   // ... you will write your Prisma Client queries here
-  const visitors = await prisma.visitor.findUnique({
-    where: {
-      id: "65bbaadc02c0c3f726dcbf3a"
-    }
-  })
-  
 
-  console.log("visitors from client: ", visitors?.count);
-  
 }
 
 main()
